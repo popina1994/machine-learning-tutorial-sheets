@@ -10,12 +10,52 @@
 \author{Djordje Zivanovic}
 \title{Second Homework from Machine Learning}
 \begin{document}
-Test
-sdffdssdf
-sd
-sdf
 
-sdf
-sdf
-sfd
-\end{document}`
+\centerline{\large \bf Machine learning : Sheet 2}
+\centerline{\large Author : Djordje Zivanovic}
+\bigskip
+%Chapter 1 in Ockendon \& Tayler: Applied PDE's 
+%{\it Maths Institute Lecture Notes}. 
+%{\bf Exercises 1, 2, 4, 5}.
+\newcommand{\transpose}[1]{#1 ^ \text{T}}
+
+\begin{enumerate}
+\item
+On the lectures we got the following equation:
+$$\text{NLL}(\textbf{y}\,\vert\,\textbf{X}, \textbf{w}, \sigma)= \frac{1}{2\sigma^2}(\textbf{Xw} - \textbf{y})^\text{T}(\textbf{Xw} - \textbf{y}) + \frac{N}{2}\log(2\pi\sigma^2)$$
+By setting derivative over $\sigma$ to 0, we get the following:
+\begin{align*}
+\frac{\partial \text{NLL}(\textbf{y}\,\vert\,\textbf{X}, \textbf{w}, \sigma)}{\partial \sigma} &= \frac{-2\sigma^{-3}}{2} (\textbf{Xw} - \textbf{y})^\text{T}(\textbf{Xw} - \textbf{y}) + 
+\frac{N}{2}\frac{2\pi 2\sigma}{2\pi\sigma^2}\\
+&= -\sigma^{-3} (\textbf{Xw} - \textbf{y})^\text{T}(\textbf{Xw} - \textbf{y}) + \frac{N}{\sigma} = 0
+\end{align*}
+Multiplying the last expression with $\sigma^3$, because variance cannot be 0, and dividing by $N$ we get $$\sigma^2 =\frac{(\textbf{Xw} - \textbf{y})^\text{T}(\textbf{Xw} - \textbf{y})}{N} $$
+Since optimal $\textbf{w}$ is calculated by setting gradient to zero, we insert $\textbf{w}_{\textbf{ML}}$ to the last equation and get the necessary $\sigma$.
+\item By using vector multiplication rules we can simplify the expression:
+\begin{align*}
+\mathcal{L}_{ridge}(\textbf{w},b) 
+&= \transpose{(\textbf{Xw}+b\textbf{1}-\textbf{y})}(\textbf{Xw}+b\textbf{1}-\textbf{y})+\lambda \transpose{\textbf{w}}\textbf{w}\\
+&= \transpose{\textbf{w}}\transpose{\textbf{X}}\textbf{Xw} + \transpose{\textbf{w}}\transpose{\textbf{X}}b\textbf{1}-\transpose{\textbf{w}}\transpose{\textbf{X}}\textbf{y}+b\transpose{\textbf{1}}\textbf{X}\textbf{w} + b^2N -b\transpose{\textbf{1}}\textbf{y} - \transpose{\textbf{y}}\textbf{Xw}-b\transpose{y}\textbf{1} + \transpose{\textbf{y}} \textbf{y} + \lambda \transpose{\textbf{w}}\textbf{w}\\
+\end{align*}
+Deriving $\mathcal{L}_{ridge}(\textbf{w},b) $ per $b$ and equaling to zero we get:
+\begin{align*}
+\frac{\partial\mathcal{L}_{ridge}(\textbf{w},b)}{\partial b} &= 
+0 + \transpose{\textbf{w}}\transpose{\textbf{X}}\textbf{1} - 0 + \transpose{\textbf{1}}\textbf{X}\textbf{w} + 2bN - \transpose{\textbf{1}}\textbf{y} - 0  - \transpose{y}\textbf{1} + 0 + 0\\
+&= \transpose{\textbf{w}}\transpose{\textbf{X}}\textbf{1}  + \transpose{\textbf{1}}\textbf{X}\textbf{w}+ 2bN - 2\transpose{\textbf{y}}\textbf{1} = 0
+\end{align*}
+Using the property that product of $\transpose{\textbf{A}}B=\transpose{B}A$ when $\textbf{A,B}$ are column vectors we got the simplification of the last equation.
+Further, $\transpose{\textbf{X}}$ when multiplied by $\textbf{1}$ from column matrix whose cells are the sum of the same features. From the beginning condition that sum for every possible set of features is 0, the first two addends will give 0 as a result (associativity of matrix multiplication). Thus, we get $b = \transpose{\textbf{y}}$ which is equivalent to $\hat{b}=\frac{1}{N}\sum_{i=1}^Ny_i$.
+\\
+Deriving $\mathcal{L}_{ridge}(\textbf{w},b) $ per $\textbf{w}$ and equaling to zero we get:
+\begin{align*}
+\frac{\partial\mathcal{L}_{ridge}(\textbf{w},b)}{\partial \textbf{w}} &= 
+2\transpose{\textbf{X}}\textbf{X}\textbf{w} + 0 -  \transpose{\textbf{X}}\textbf{y} + 0 + 0 - 0 - \transpose{\textbf{X}}\textbf{y }- 0 + 0 +2\lambda\textbf{w}\\
+&= 2\transpose{\textbf{X}}\textbf{X}\textbf{w} -2 \transpose{\textbf{X}}\textbf{y}  + 2\lambda\textbf{w} = 0
+\end{align*}
+In the previous derivation we simplified some expression (set them to zero) using the same observation $\transpose{\textbf{X}}\textbf{1}=0$. Using distributivity of matrix multiplication $$ (\transpose{\textbf{X}}\textbf{X} + \lambda \textbf{I}_D)\textbf{w} = \transpose{\textbf{X}}\textbf{y} $$ 
+Multiplying the both sides by $(\transpose{\textbf{X}}\textbf{X} + \lambda \textbf{I}_D)$ we get the $\hat{\textbf{w}}=(\transpose{\textbf{X}}\textbf{X} + \lambda \textbf{I}_D)^{-1}\transpose{\textbf{X}}\textbf{y}$.
+\\
+Consequence of centering $\textbf{y}$ gives us that bias is unnecessary in this case (we would need neither to calculate nor to use it).
+\end{enumerate}
+
+\end{document}
