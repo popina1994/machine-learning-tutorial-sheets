@@ -156,7 +156,82 @@ The equation \ref{eq:product3} is the other way to calculate Eucleadean norm usi
 \\
 By adding equations \ref{eq:last2} and \ref{eq:last3} we get the expression from \ref{eq:last}.
 \end{enumerate}
+\item
+\begin{enumerate}
+\item[1.]
+We can notice that $$p(x, y \vert \mathbf{\theta})=p (y\vert, x, \mathbf{\theta})p(x|\mathbf{\theta})$$
+Inserting corresponding probabilities we get the table as on the figure \ref{fig:Prob}.
 
+\begin{figure}[htb!]
+\begin{center}
+\begin{tabular}{c|cc}
+ & $y=0$ & $y=1$ \\ 
+\hline 
+$x=0$ & $\theta_2(1-\theta_1)$ & $(1-\theta_2)(1-\theta_1)$ \\ 
+$x=1$ & $(1-\theta_2)\theta_1$ & $\theta_2\theta1$ \\ 
+\end{tabular} 
+\end{center}
+\caption{Probabilities}
+\label{fig:Prob}
+\end{figure}
+
+\item[2.]
+If we denote with $\alpha_1, \alpha_2, \alpha_3, \alpha_4$, respectively, the number of events where tuple $(x, y)$ is $(0, 0), (0, 1), (1, 0), (1, 1)$, we have the following:
+\begin{align*}
+MLE(p(x, y|\theta_1, \theta_2)) &= \theta_2^{\alpha_1}(1-\theta_1)^{\alpha_1}(1-\theta_2)^{\alpha_2}(1-\theta_1)^{\alpha_2}(1-\theta_2)^{\alpha_3}\theta_1^{\alpha_3}\theta_2^{\alpha_4}\theta_1^{\alpha_4} \nonumber \\
+&= \theta_1^{\alpha_3 + \alpha_4}\theta_2^{\alpha_1+\alpha4}
+(1-\theta_1)^{\alpha_1 + \alpha_2}(1-\theta_2)^{\alpha_2 + \alpha_3}
+\end{align*}
+By calculating derivatives $MLE(p(x, y|\theta_1, \theta_2$ per $\theta_1, \theta_2)$ and setting them to 0 we get:
+\begin{align*}
+\frac{\partial MLE(p(x, y|\theta_1, \theta_2)}{\partial \theta_1})&= (\alpha_3+\alpha_4)\theta_1^{\alpha_3+\alpha_4 -1}\theta_2^{\alpha_1+\alpha4}
+(1-\theta_1)^{\alpha_1 + \alpha_2}(1-\theta_2)^{\alpha_2 + \alpha_3}\\
+&- (\alpha_1+\alpha_2)\theta_1^{\alpha_3+\alpha_4}\theta_2^{\alpha_1+\alpha4}
+(1-\theta_1)^{\alpha_1 + \alpha_2-1}(1-\theta_2)^{\alpha_2 + \alpha_3}=0
+\end{align*}
+By dividing both side of equation by $\theta_1^{\alpha_3+\alpha_4-1}\theta_2^{\alpha_1+\alpha4}
+(1-\theta_1)^{\alpha_1 + \alpha_2-1}(1-\theta_2)^{\alpha_2 + \alpha_3}$ we get:
+\begin{align*}
+(\alpha_3+\alpha_4)(1-\theta_1)- (\alpha_1 + \alpha_2)\theta_1 = 0
+\end{align*}
+Thus $\theta_1 = \frac{\alpha_3+\alpha_4}{\alpha_1+\alpha_2 + \alpha_3+\alpha_4}$. Similarly $\theta_2 = \frac{\alpha_1+\alpha_4}{\alpha_1+\alpha_2 + \alpha_3+\alpha_4}$
+Replacing the values from our dataset we get $\theta_1 = \frac{4}{7}$ and $\theta_2=\frac{4}{7}$. The $p(\mathcal{D}|\hat{\theta},M_2)$ is given on figure
+\ref{fig:prediction}. If we calculated MLE for $p(x|\theta)$ and $p(y|\theta)$ we would get the same probabilities as we can see that $\theta_1$ is not dependent on $\theta_2$ and vice versa in $p(x, y|\theta)$.
+\begin{figure}[htb!]
+\begin{center}
+\begin{tabular}{c|cc}
+ & $y=0$ & $y=1$ \\ 
+\hline 
+$x=0$ & $\frac{12}{49}$ & $\frac{9}{49}$ \\ 
+$x=1$ & $\frac{12}{49}$ & $\frac{16}{49}$ \\ 
+\end{tabular} 
+\end{center}
+\caption{Probabilities}
+\label{fig:prediction}
+\end{figure} 
+\item[3.]
+Let us denote number of occurrences  of each tuple, respectively, with $\alpha_1, \alpha_2, \alpha_3, \alpha_4$. Then we would like to maximize:
+$$MLE=\theta_{0,0}^{\alpha_1}\theta_{0, 1}^{\alpha_2}\theta_{1, 0}^{\alpha_3}\theta_{1, 1}^{\alpha_4} =\theta_{0,0}^{\alpha_1}\theta_{0, 1}^{\alpha_2}\theta_{1, 0}^{\alpha_3}(1-\theta_{0, 0}-\theta_{0, 1}-\theta_{1, 0})^{\alpha_4}$$ 
+Thus, let us change $A = \theta_{0, 0}, B=\theta_{0, 1}, C=\theta_{1, 0}$. Further, due to maximization we need have derivative equal to zero:
+$$\frac{\partial MLE}{\partial A} =\alpha_1 A^{\alpha_1-1}B^{\alpha_2}C^{\alpha_3}(1-A-B-C)^{\alpha_4} -\alpha_4 A^{\alpha_1}B^{\alpha_2}C^{\alpha_3}(1-A-B-C)^{\alpha_4 -1}=0 $$
+\end{enumerate}
+Dividing both sides of equation by $A^{\alpha_1-1}B^{\alpha_2}C^{\alpha_3}(1-A-B-C)^{\alpha_4 -1}$ we get:
+$$\alpha_1(1-A-B-C)-\alpha_4A=0$$
+$$(\alpha_1 + \alpha_4 )A + \alpha_1B +\alpha_1C = \alpha_1$$
+Similarly:
+$$(\alpha_2 + \alpha_4 )B + \alpha_2A +\alpha_2C = \alpha_2$$
+$$(\alpha_3 + \alpha_4 )C + \alpha_3A +\alpha_3B = \alpha_3$$
+The determinant is:
+$\begin{vmatrix}
+\alpha_1 + \alpha_4 & \alpha_1 & \alpha_1 \\ 
+\alpha_2 & \alpha_2 + \alpha_4 & \alpha_2 \\ 
+\alpha_3 & \alpha_3 &  \alpha_3 + \alpha_4\\ 
+\end{vmatrix}$
+which is positive always (because the result is the sum of positive monomials).
+This means the system has a unique solution.
+If we try the solution: $$(A, B, C) = \left(\frac{\alpha_1}{\alpha_1 + \alpha_2+\alpha_3+\alpha_4},
+ \frac{\alpha_2}{\alpha_1 + \alpha_2+\alpha_3+\alpha_4}
+ \frac{\alpha_3}{\alpha_1 + \alpha_2+\alpha_3+\alpha_4}\right)$$ We can see it satisfies solutions. 
 \end{enumerate}
 
 \end{document}
