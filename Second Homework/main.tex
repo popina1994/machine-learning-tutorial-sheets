@@ -18,6 +18,7 @@
 %{\it Maths Institute Lecture Notes}. 
 %{\bf Exercises 1, 2, 4, 5}.
 \newcommand{\transpose}[1]{#1 ^ \text{T}}
+\newcommand{\expectation}{\underset{\mathcal{D}}{\mathbb{E}}}
 
 \begin{enumerate}
 \item
@@ -56,6 +57,106 @@ In the previous derivation we simplified some expression (set them to zero) usin
 Multiplying the both sides by $(\transpose{\textbf{X}}\textbf{X} + \lambda \textbf{I}_D)$ we get the $\hat{\textbf{w}}=(\transpose{\textbf{X}}\textbf{X} + \lambda \textbf{I}_D)^{-1}\transpose{\textbf{X}}\textbf{y}$.
 \\
 Consequence of centering $\textbf{y}$ gives us that bias is unnecessary in this case (we would need neither to calculate nor to use it).
+\item 
+\begin{enumerate}
+\item[1.]
+Using properties of expectation:
+\begin{align}
+\mathbb{E}(\hat{\textbf{w}}_\text{LS}(\mathcal{D}) \vert \mathcal{D}) 
+&= \mathbb{E}((\transpose{\textbf{X}}X)^{-1}\transpose{\textbf{X}}\textbf{y}\vert \mathcal{D})\nonumber \\
+&= (\transpose{\textbf{X}}\textbf{X})^{-1}\transpose{\textbf{X}}\mathbb{E}(\textbf{y}\vert \mathcal{D}) \label{eq:const} \\
+&= (\transpose{\textbf{X}}\textbf{X})^{-1}\transpose{\textbf{X}}\textbf{X}\textbf{w}^* \label{eq:task}\\
+&= I\textbf{w}^* = \textbf{w}^*  \nonumber
+\end{align}
+The equation \ref{eq:const}is correct by using property of expected value that it is possible to pull out constant from the parenthesis. The equation \ref{eq:task} is correct because it is stated that $\mathbb{E}(\textbf{y}\vert \mathcal{D})=\textbf{X}\textbf{w}^* $ in the text of the task. 
+\item[2.]
+\begin{align}
+\expectation \left[ \vert\vert \hat{\textbf{w}}(\mathcal{D})-\textbf{w}^*\vert \vert ^2\right]
+ &= \underset{\mathcal{D}}{\mathbb{E}}\left[ 
+\transpose{(\hat{\textbf{w}}(\mathcal{D})-\textbf{w}^*)}(\hat{\textbf{w}}(\mathcal{D})-\textbf{w}^*)\right] \label{eq:product}\\
+&= \expectation\left[ 
+\transpose{\hat{\textbf{w}}(\mathcal{D})} \hat{\textbf{w}}(\mathcal{D}) - 
+\transpose{(\textbf{w}^*)} \hat{\textbf{w}}(\mathcal{D}) - 
+\transpose{\hat{\textbf{w}}(\mathcal{D})} \textbf{w}^*
++ \transpose{(\textbf{w}^*)} \textbf{w}^*
+\right] \label{eq:dis}\\
+&= \expectation \left[ 
+\transpose{(\hat{\textbf{w}}(\mathcal{D}))} \hat{\textbf{w}}(\mathcal{D})\right] - 
+\transpose{(\textbf{w}^*)} \expectation \left[ \hat{\textbf{w}}(\mathcal{D})\right] - 
+\expectation \left[ \transpose{(\hat{\textbf{w}}(\mathcal{D}))} \right] \textbf{w}^*
++ \transpose{(\textbf{w}^*)} \textbf{w}^* \label{eq:prop}\\
+&=
+\expectation \left[ 
+\transpose{(\hat{\textbf{w}}(\mathcal{D}))} \hat{\textbf{w}}(\mathcal{D})\right] - 
+2\transpose{(\textbf{w}^*)} \expectation \left[ \hat{\textbf{w}}(\mathcal{D})\right]
++ \transpose{(\textbf{w}^*)} \textbf{w}^*\label{eq:last}
+\end{align}
+
+The equation \ref{eq:product} is the other way to calculate Eucleadean norm using scalar product. The equation \ref{eq:dis} is simple distributivity law. The equation \ref{eq:prop} uses properties of mathematical expectation. The last equation \ref{eq:last} uses only a property that a scalar product of a column and a row vector is equal to their transposed product. 
+\begin{align}
+\vert \vert \expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right]-\textbf{w}^*  \vert \vert ^2 &= 
+\transpose{(\expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right]-\textbf{w}^*)} (\expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right]-\textbf{w}^*)
+\label{eq:product2}\\
+&= 
+\transpose{(\expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right])}
+\expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right]
+- \transpose{(\expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right])}\textbf{w}^*
+-\transpose{(\textbf{w}^*)} 
+\expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right]
++\transpose{(\textbf{w}^*)} \textbf{w}^* 
+\label{eq:dis2}\\
+&=
+\transpose{(\expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right])}
+\expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right]
+- 2\transpose{(\expectation \left[  \hat{\textbf{w}}(\mathcal{D})\right])}\textbf{w}^*
++\transpose{(\textbf{w}^*)} \textbf{w}^*
+\label{eq:last2}
+\end{align}
+The equation \ref{eq:product2} is the other way to calculate Eucleadean norm using scalar product. The equation \ref{eq:dis2} is simple distributivity law. The last equation \ref{eq:last2} uses only a property that a scalar product of a column and a row vector is equal to their transposed product. 
+\begin{align}
+\expectation\left[ \vert \vert
+ \hat{\textbf{w}}(\mathcal{D}) - 
+ \expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right]
+ \vert \vert^2\right]
+ &= \expectation \left[ \transpose{\left(\hat{\textbf{w}}(\mathcal{D}) - 
+ \expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right] \right)}
+ \left(\hat{\textbf{w}}(\mathcal{D}) - 
+ \expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right]\right)
+  \right] \label{eq:product3} \\
+ &= 
+ \expectation \left[ \transpose{(\hat{\textbf{w}}(\mathcal{D}))}
+ \hat{\textbf{w}}(\mathcal{D})
+ -\transpose{\left(\expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right]\right)}
+ \hat{\textbf{w}}(\mathcal{D})
+ -\transpose{(\hat{\textbf{w}}(\mathcal{D}))}
+ \expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right] 
+ +\transpose{\left(\expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right]\right)} 
+ \expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right] 
+ \right] \label{eq:dis3}\\
+ &=  \expectation \left[ \transpose{(\hat{\textbf{w}}(\mathcal{D}))}
+ \hat{\textbf{w}}(\mathcal{D})
+ \right]
+ -\transpose{\left(\expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right]\right)}
+ \expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right]-
+ \nonumber \\
+ &-\expectation \left[ \transpose{(\hat{\textbf{w}}(\mathcal{D}))} \right]
+ \expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right] 
+ +\transpose{\left(\expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right]\right)} 
+ \expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right] 
+\label{eq:prop3} \\ 
+ &=\expectation \left[ \transpose{(\hat{\textbf{w}}(\mathcal{D}))}
+ \hat{\textbf{w}}(\mathcal{D})
+ \right]
+ -\transpose{\left(\expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right]\right)} 
+ \expectation \left[ \hat{\textbf{w}}(\mathcal{D}) \right]
+ \label{eq:last3}
+\end{align}
+
+The equation \ref{eq:product3} is the other way to calculate Eucleadean norm using scalar product. The equation \ref{eq:dis3} is simple distributivity law.  The equation \ref{eq:prop3} uses properties of mathematical expectation. The last equation \ref{eq:last3} uses only a property that a scalar product of a column and a row vector is equal to their transposed product. 
+\\
+By adding equations \ref{eq:last2} and \ref{eq:last3} we get the expression from \ref{eq:last}.
+\end{enumerate}
+
 \end{enumerate}
 
 \end{document}
