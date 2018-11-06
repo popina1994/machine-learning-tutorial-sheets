@@ -154,7 +154,7 @@ The equation \ref{eq:product2} is the other way to calculate Eucleadean norm usi
 
 The equation \ref{eq:product3} is the other way to calculate Eucleadean norm using scalar product. The equation \ref{eq:dis3} is simple distributivity law.  The equation \ref{eq:prop3} uses properties of mathematical expectation. The last equation \ref{eq:last3} uses only a property that a scalar product of a column and a row vector is equal to their transposed product. 
 \\
-By adding equations \ref{eq:last2} and \ref{eq:last3} we get the expression from \ref{eq:last}.
+By adding equations \ref{eq:last2} and \ref{eq:last3} we get the expression from the equation \ref{eq:last}.
 \end{enumerate}
 \item
 \begin{enumerate}
@@ -184,7 +184,7 @@ MLE(p(x, y|\theta_1, \theta_2)) &= \theta_2^{\alpha_1}(1-\theta_1)^{\alpha_1}(1-
 \end{align*}
 By calculating derivatives $MLE(p(x, y|\theta_1, \theta_2$ per $\theta_1, \theta_2)$ and setting them to 0 we get:
 \begin{align*}
-\frac{\partial MLE(p(x, y|\theta_1, \theta_2)}{\partial \theta_1})&= (\alpha_3+\alpha_4)\theta_1^{\alpha_3+\alpha_4 -1}\theta_2^{\alpha_1+\alpha4}
+\frac{\partial MLE(p(x, y|\theta_1, \theta_2))}{\partial \theta_1}&= (\alpha_3+\alpha_4)\theta_1^{\alpha_3+\alpha_4 -1}\theta_2^{\alpha_1+\alpha4}
 (1-\theta_1)^{\alpha_1 + \alpha_2}(1-\theta_2)^{\alpha_2 + \alpha_3}\\
 &- (\alpha_1+\alpha_2)\theta_1^{\alpha_3+\alpha_4}\theta_2^{\alpha_1+\alpha4}
 (1-\theta_1)^{\alpha_1 + \alpha_2-1}(1-\theta_2)^{\alpha_2 + \alpha_3}=0
@@ -210,12 +210,13 @@ $x=1$ & $\frac{12}{49}$ & $\frac{16}{49}$ \\
 \label{fig:prediction}
 \end{figure} 
 \item[3.]
-Let us denote number of occurrences  of each tuple, respectively, with $\alpha_1, \alpha_2, \alpha_3, \alpha_4$. Then we would like to maximize:
+Let us denote number of occurrences  of each tuple $x, y$, $(0, 0), (0, 1), (1, 0), (1, 1)$ respectively, with $\alpha_1, \alpha_2, \alpha_3, \alpha_4$. Then we would like to maximize:
 $$MLE=\theta_{0,0}^{\alpha_1}\theta_{0, 1}^{\alpha_2}\theta_{1, 0}^{\alpha_3}\theta_{1, 1}^{\alpha_4} =\theta_{0,0}^{\alpha_1}\theta_{0, 1}^{\alpha_2}\theta_{1, 0}^{\alpha_3}(1-\theta_{0, 0}-\theta_{0, 1}-\theta_{1, 0})^{\alpha_4}$$ 
-Thus, let us change $A = \theta_{0, 0}, B=\theta_{0, 1}, C=\theta_{1, 0}$. Further, due to maximization we need have derivative equal to zero:
+Thus, let us change $A = \theta_{0, 0}, B=\theta_{0, 1}, C=\theta_{1, 0}$. Further, due to maximization we need to have derivative equal to zero:
 $$\frac{\partial MLE}{\partial A} =\alpha_1 A^{\alpha_1-1}B^{\alpha_2}C^{\alpha_3}(1-A-B-C)^{\alpha_4} -\alpha_4 A^{\alpha_1}B^{\alpha_2}C^{\alpha_3}(1-A-B-C)^{\alpha_4 -1}=0 $$
-\end{enumerate}
-Dividing both sides of equation by $A^{\alpha_1-1}B^{\alpha_2}C^{\alpha_3}(1-A-B-C)^{\alpha_4 -1}$ we get:
+
+
+	Dividing both sides of equation by $A^{\alpha_1-1}B^{\alpha_2}C^{\alpha_3}(1-A-B-C)^{\alpha_4 -1}$ we get:
 $$\alpha_1(1-A-B-C)-\alpha_4A=0$$
 $$(\alpha_1 + \alpha_4 )A + \alpha_1B +\alpha_1C = \alpha_1$$
 Similarly:
@@ -231,7 +232,11 @@ which is positive always (because the result is the sum of positive monomials).
 This means the system has a unique solution.
 If we try the solution: $$(A, B, C) = \left(\frac{\alpha_1}{\alpha_1 + \alpha_2+\alpha_3+\alpha_4},
  \frac{\alpha_2}{\alpha_1 + \alpha_2+\alpha_3+\alpha_4}
- \frac{\alpha_3}{\alpha_1 + \alpha_2+\alpha_3+\alpha_4}\right)$$ We can see it satisfies solutions. 
+ \frac{\alpha_3}{\alpha_1 + \alpha_2+\alpha_3+\alpha_4}\right)$$ we can see this tuple satisfies solutions. 
+ \item [4.]
+ For the data set give in subtask 2. the 2-parameter model will be chosen (if we do all calculations manually), because the 4-parameter model overfits the data.
+ IN generals case the calculations would have to be done, but problem of overfitting would limit the 4-parameter model ability to learn more widely.  
+\end{enumerate}
 \end{enumerate}
 
 \end{document}
