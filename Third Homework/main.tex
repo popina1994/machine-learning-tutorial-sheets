@@ -1,0 +1,68 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage{bm}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\author{Djordje Zivanovic}
+\title{Second Homework from Machine Learning}
+\begin{document}
+
+\centerline{\large \bf Machine learning : Sheet 3}
+\centerline{\large Author : Djordje Zivanovic}
+\bigskip
+%Chapter 1 in Ockendon \& Tayler: Applied PDE's  
+%{\it Maths Institute Lecture Notes}. 	
+%{\bf Exercises 1, 2, 4, 5}.
+\newcommand{\transpose}[1]{#1 ^ \text{T}}
+\newcommand{\mat}[1]{\textbf{\text{{#1}}}}
+\newcommand{\vect}[1]{\mat{#1}}
+\newcommand{\gradient}[1]{\nabla_{\vect{#1}}}
+\newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
+
+\begin{enumerate}
+\item 
+\begin{enumerate}
+\item[1.]
+\begin{equation}
+\mathcal{L}(w) = \sum_{i=1}^N|\transpose{\vect{w}}\vect{x}_i - y_i| + \lambda\sum_{i=1}^D|w_i| \label{eq:objective}
+\end{equation}
+Objective function $\mathcal{L}$ is equivalent to solving the following linear program with $2D+ N$ variables $w_1, \ldots, w_D, \zeta_1,\ldots, \zeta_{N+D}$ :
+	\begin{align*}
+		\text{minimize  } &\sum_{i=1}^{N}\zeta_i\\
+		\text{subject to:}\\
+		\transpose{\vect{w}}\vect{x}_i - y_i &\leq \zeta_i, i \in \{ 1, \ldots, N \}  \numberthis \label{eq:leftAbsW}\\
+		 y_i - \transpose{\vect{w}}\vect{x}_i &\leq \zeta_i, i \in \{ 1, \ldots, N\}  \numberthis \label{eq:rightAbsW} \\
+		 \lambda w_i &\leq \zeta_i,  i \in \{ N + 1, \ldots, N + D\} \numberthis 
+		 \label{eq:leftAbsL} \\
+		 -\lambda w_i &\leq \zeta_i, i \in \{ N + 1, \ldots, N + D\} \numberthis 
+		 \label{eq:rightAbsL}\\
+\end{align*}
+	
+We need to prove that the linear program is indeed the solution of the $\mathcal{L}(w)$ objective function. First we need to prove that a solution exists. We notice that, any vector $\vect{w}$ in $\mathbb{R}^D$ and $\zeta_i=|\transpose{\vect{w}}\vect{x}_i - -y_i| \text{ for } 1 \leq i \leq N$ and $\zeta_i=|\lambda w_i| \text{ for } N + 1 \leq i \leq N + D $ are solutions of the linear program. By seeing that equations \ref{eq:leftAbsW}  and \ref{eq:rightAbsW} are the definitions of absolute values for $\zeta_i, i\in \{1, \ldots, N\}$ and that equalities hold in all cases, this solution is valid for these inequalities. Similarly, equations \ref{eq:leftAbsL} and \ref{eq:rightAbsL} are the definitions of absolute values for $\zeta_i, i\in \{N+1, \ldots, N+D\}$ and equalities hold in all cases. Thus the linear program has at least one solution. 
+\\
+Further, we need to prove that the solution of the linear program is the solution of the loss function \ref{eq:objective}. Since $\zeta_i$s are limited by inequalities from bellow and for all of them limitations are absolute values which are nonnegative numbers, this means their sum is minimized when the sum of these nonnegative numbers is minimized. Thus, the solution of program has to be the solution of minimization of objective function, because a minimization over a sum of nonnegative numbers is done on the whole $\mathbb{R}^D$ vector space for $\vect{w}$ which is equivalent to the objective function \ref{eq:objective}. 
+\item[2.] 
+First let us compute subgradient:
+\begin{align}
+	\gradient{w} \mathcal{L}(\vect{w} &= 
+	\gradient{w} \sum_{i=1}^N(\transpose{\vect{w}}\vect{x}_i - y_i)^2 + \lambda\sum_{i=1}^D\gradient{w} |w_i| \label{eq:pass} \\
+	&= \gradient{w} \transpose{(\mat{X}\vect{w} - \vect{y})}(\mat{X}\vect{w}-\vect{y})+\lambda \sum_{i=1}^D \gradient{w} |w_i| \label{eq:CompactForm}\\
+	&= \gradient{w}(\transpose{\vect{w}}\transpose{\mat{X}} - \transpose{\vect{y}})(\mat{X}\vect{w}-\vect{y}) + \lambda \sum_{i=1}^D \gradient{w} |w_i| \label{eq:transpProp} \\
+	&=\gradient{w} \transpose{\vect{w}}\transpose{\mat{X}}\mat{X}\vect{w}-\gradient{w}\transpose{\vect{w}}\transpose{\mat{X}}\vect{y}- \gradient{w} \transpose{\vect{y}}\mat{X}\vect{w} + \gradient{w}\transpose{\vect{y}}\vect{y} +  \lambda \sum_{i=1}^D \gradient{w} |w_i|\label{eq:simpleCalc}\\
+	&= 2\transpose{\mat{X}}\mat{X}\vect{w} - 2\transpose{\mat{X}} + 0 + \lambda \sum_{i=1}^D \gradient{w} |w_i| \label{eq:gradientCalc}
+\end{align}
+In the previous derivation we used the gradient property to "go" through addition in equation \ref{eq:pass}. The equation \ref{eq:CompactForm} is compacted version of the sum from the equation \ref{eq:pass}. The equation \ref{eq:transpProp} uses property that transposition of matrices exchanges the order of multipliers in multiplication. The equation \ref{eq:simpleCalc} uses simple calculations and the property of gradient to pass through addition. The equation \ref{eq:gradientCalc} uses gradient rules for derivations such as quadratic and multiplied by constant.
+A subgradient of $|w_i|$ is $g_\vect{w}|w_i| = [0, ..., sgnext(w_i), ..., 0]^\text{T}$, where $sgnext$ represents extended $sgn$ function which for values greater than zero is $1$, less than zero is $-1$, and for the value 0 is either $-1$ or $1$. The subgradient column vector has all cells 0 except the $i$-th which is $sgnext$.
+$$g_{\vect{w}} = 2\transpose{\mat{X}}\mat{X}\vect{w} - 2\transpose{\mat{X}} + 0 + \lambda \sum_{i=1}^D g_{\vect{w}}|w_i| $$
+Thus the calculation rule using modified version of gradient descent is:
+$$\vect{w}_{t+1}=\vect{w}_t - \eta g_{w_t}$$
+ 
+  \end{enumerate}
+\end{enumerate}
+
+\end{document}
