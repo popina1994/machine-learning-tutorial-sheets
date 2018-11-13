@@ -10,6 +10,7 @@
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
 \author{Djordje Zivanovic}
 \title{Second Homework from Machine Learning}
+
 \begin{document}
 
 \centerline{\large \bf Machine learning : Sheet 3}
@@ -22,7 +23,9 @@
 \newcommand{\mat}[1]{\textbf{\text{{#1}}}}
 \newcommand{\vect}[1]{\mat{#1}}
 \newcommand{\gradient}[1]{\nabla_{\vect{#1}}}
+\newcommand{\der}[1]{\frac{\partial}{\partial #1}}
 \newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand{\logfun}{\sigma(\transpose{\vect{x}}_i \vect{w})}
 
 \begin{enumerate}
 \item 
@@ -47,22 +50,142 @@ We need to prove that the linear program is indeed the solution of the $\mathcal
 \\
 Further, we need to prove that the solution of the linear program is the solution of the loss function \ref{eq:objective}. Since $\zeta_i$s are limited by inequalities from bellow and for all of them limitations are absolute values which are nonnegative numbers, this means their sum is minimized when the sum of these nonnegative numbers is minimized. Thus, the solution of program has to be the solution of minimization of objective function, because a minimization over a sum of nonnegative numbers is done on the whole $\mathbb{R}^D$ vector space for $\vect{w}$ which is equivalent to the objective function \ref{eq:objective}. 
 \item[2.] 
-First let us compute subgradient:
+First let us compute gradient as much as we can:
 \begin{align}
-	\gradient{w} \mathcal{L}(\vect{w} &= 
+	\gradient{w} \mathcal{L}(\vect{w}) &= 
 	\gradient{w} \sum_{i=1}^N(\transpose{\vect{w}}\vect{x}_i - y_i)^2 + \lambda\sum_{i=1}^D\gradient{w} |w_i| \label{eq:pass} \\
 	&= \gradient{w} \transpose{(\mat{X}\vect{w} - \vect{y})}(\mat{X}\vect{w}-\vect{y})+\lambda \sum_{i=1}^D \gradient{w} |w_i| \label{eq:CompactForm}\\
 	&= \gradient{w}(\transpose{\vect{w}}\transpose{\mat{X}} - \transpose{\vect{y}})(\mat{X}\vect{w}-\vect{y}) + \lambda \sum_{i=1}^D \gradient{w} |w_i| \label{eq:transpProp} \\
 	&=\gradient{w} \transpose{\vect{w}}\transpose{\mat{X}}\mat{X}\vect{w}-\gradient{w}\transpose{\vect{w}}\transpose{\mat{X}}\vect{y}- \gradient{w} \transpose{\vect{y}}\mat{X}\vect{w} + \gradient{w}\transpose{\vect{y}}\vect{y} +  \lambda \sum_{i=1}^D \gradient{w} |w_i|\label{eq:simpleCalc}\\
-	&= 2\transpose{\mat{X}}\mat{X}\vect{w} - 2\transpose{\mat{X}} + 0 + \lambda \sum_{i=1}^D \gradient{w} |w_i| \label{eq:gradientCalc}
+	&= 2\transpose{\mat{X}}\mat{X}\vect{w} - 2\transpose{\mat{X}}\vect{y} + 0 + \lambda \sum_{i=1}^D \gradient{w} |w_i| \label{eq:gradientCalc}
 \end{align}
 In the previous derivation we used the gradient property to "go" through addition in equation \ref{eq:pass}. The equation \ref{eq:CompactForm} is compacted version of the sum from the equation \ref{eq:pass}. The equation \ref{eq:transpProp} uses property that transposition of matrices exchanges the order of multipliers in multiplication. The equation \ref{eq:simpleCalc} uses simple calculations and the property of gradient to pass through addition. The equation \ref{eq:gradientCalc} uses gradient rules for derivations such as quadratic and multiplied by constant.
-A subgradient of $|w_i|$ is $g_\vect{w}|w_i| = [0, ..., sgnext(w_i), ..., 0]^\text{T}$, where $sgnext$ represents extended $sgn$ function which for values greater than zero is $1$, less than zero is $-1$, and for the value 0 is either $-1$ or $1$. The subgradient column vector has all cells 0 except the $i$-th which is $sgnext$.
-$$g_{\vect{w}} = 2\transpose{\mat{X}}\mat{X}\vect{w} - 2\transpose{\mat{X}} + 0 + \lambda \sum_{i=1}^D g_{\vect{w}}|w_i| $$
-Thus the calculation rule using modified version of gradient descent is:
+A subgradient of $|w_i|$ is $g_\vect{w}|w_i| = [0, ..., sgnext(w_i), ..., 0]^\text{T}$, where $sgnext$ represents extended $sgn$ function which for values greater than zero is $1$, less than zero is $-1$, the value 0 is either $-1$ or $1$. The subgradient column vector has all cells 0 except the $i$-th which is $sgnext$. If we sum subgradients for each $w_i, i\in \{ 1, ..., D\}$, we get a column vector whose cells are values of $sgnext$ of specific $w_i$. Finally, subgradient of the objective function is:
+$$g_{\vect{w}} = 2\transpose{\mat{X}}\mat{X}\vect{w} - 2\transpose{\mat{X}}\vect{y} +\lambda [sgnext(w_1), ..., sgnext(w_D)]^\text{T} $$
+Thus, the calculation rule using modified version of gradient descent is:
 $$\vect{w}_{t+1}=\vect{w}_t - \eta g_{w_t}$$
- 
   \end{enumerate}
+\item[2.]
+\begin{enumerate}
+\item[1.]
+\begin{align}
+	\sigma'(z) &= \der{z}\frac{1}{1 + e^{-z}} = \der{z} (1+e^{-z})^{-1} \label{eq:derivDef} \\
+			   &=  \frac{e^{-z}}{(1+e^{-z})^2} \label{eq:derivProp} \\
+			   &= \sigma(z)\frac{e^{-z}}{1+e^{-z}} = 
+			   = \sigma(z)\left(\frac{1 + e^{-z} - 1 }{1+e^{-z}}\right) 
+			   \sigma(z)\left(1 - \frac{1}{1+e^{-z}}\right)  \label{eq:trick} \\
+			   &= \sigma(z)(1 - \sigma(z)) \label{eq:derPropS}	
+\end{align}
+The equation \ref{eq:derivDef} is definition for derivation of function in a point. The equation \ref{eq:derivProp} uses derivation properties (exponential function, constant, power function). Equation \ref{eq:trick} uses simple tricks so we could get the end result. The equation \ref{eq:derPropS} is what is requested. 
+\item[2.]
+\begin{align*}
+	Likelihood(\vect{y}) = p(\vect{y} | \mat{X}, \vect{w}) = \prod_{i=1}^Np(y_i|\vect{x}_i, \vect{w}) = 
+	\prod_{i=1}^N (\logfun)^{y_i}(
+	1 - \logfun)^{(1-y_i)}
+\end{align*}
+The previous is correct because for $y_i = 1$ just the first multiplier will be part of the product because $1-y_1$ will set the second multiplier to 1. Similarly, stands for $y_i = 0$.
+\item[3.]
+Taking negative log of the likelihood we get:
+\begin{align}
+NLL(\vect{y})-\log(Likelihood(\vect{y}) &= -\log \prod_{i=1}^N \sigma(\transpose{\vect{x}_i}\vect{w})^{y_i}(
+	1 - \sigma(\transpose{\vect{x}}_i\vect{w}))^{(1-y_i)} \nonumber \\
+	&= -\sum_{i=1}^Ny_i\log (\logfun) + (1-y_i)\log(1-\logfun) \label{eq:logProp}
+\end{align}
+Equation \ref{eq:logProp} uses basic properties of logarithm: $\log(ab) =\log(a) + \log(b)$, and $\log(a^b) = b\log(a)$.
+\begin{align}
+	\gradient{w}NLL(y_i|\vect{x}_i, \vect{w})
+	&=\gradient{w}-\left[y_i\log (\logfun) + (1-y_i)\log(1-\logfun)\right] \label{eq:definitionNLL}\\
+	&=-\left[y_i\frac {\logfun\cdot(1-\logfun)\cdot \vect{x}_i}{\logfun}
+	 + (1-y_i)\frac{(-1)\cdot\logfun \cdot (1-\logfun)\cdot \vect{x}_i}{1-\logfun}\right] \label{eq:derRulG}\\
+	 &= -y_i\cdot (1-\logfun)\cdot \vect{x}_i + (1-y_i)\cdot \logfun \cdot \vect{x}_i  \label{eq:simple1}\\
+	 &= (-y_i +y_i \cdot \logfun + \logfun - y_i \cdot \logfun )\vect{x}_i  \label{eq:simple2} \\
+	 &= (\logfun - y_i)\vect{x}_i  \label{eq:simple3}
+\end{align}
+The equation \ref{eq:definitionNLL} is using negative log likelihood for one label got in the equation \ref{eq:logProp}. The equation \ref{eq:derRulG} uses rules for derivatives and gradients (gradient behaves the same as derivative until we "reach" the variable that is dependent on gradient operand). The equations \ref{eq:simple1}, \ref{eq:simple2}, \ref{eq:simple3} use simple additions and multiplications.
+Gradient of the negative log likelihood is the sum of gradients from \ref{eq:simple3} for each label:
+$$\gradient{w}NLL(Y|\mat{X}, \vect{w})= \sum_{i=1}^N (\logfun - y_i)\vect{x}_i  $$
+First we will calculate $i$-th row of Hessian matrix:
+\begin{align}
+\der{w_j}\gradient{w}NLL(Y|\mat{X}, \vect{w}) = \sum_{i=1}^N  \transpose{\vect{x}_i} \cdot \logfun \cdot (1-\logfun)x_{i,j} \label{eq:complex}
+\end{align}
+Notice that the equation \ref{eq:complex} is derived using basic derivation properties. However, let us notice that for all the elements of first rows we have that different rows are multiplied by $[x_{1,1}, x_{2,1}, ..., x_{N, 1}]^\text{T}$ and notice that the multipliers are respectively $[x_{1, 1}, ..., x_{1, N}], ...,  [x_{D, 1}, ..., x_{D, N}]$. Similar rule we can notice for the other rows of Hesisan Matrix, just instead of $[x_{1,1}, x_{2,1}, ..., x_{N, 1}]^\text{T}$ $[x_{1,j}, x_{2,j}, ..., x_{N, j}]^\text{T}$ is, where $j$ represents the row of the Hessian matrix. Thus, our Hessian matrix should be the product of the if we did not have $\sigma$s:
+\begin{equation}
+\begin{bmatrix}
+    x_{1,1}       & x_{2, 1} & x_{3, 1} & \dots & x_{N, 1} \\
+    x_{1,2}       & x_{2, 2} & x_{3, 2} & \dots & x_{N, 2} \\
+    \hdotsfor{5} \\
+    x_{1, D}       & x_{2, D} & x_{3, D} & \dots & x_{N, D}
+\end{bmatrix} \cdot
+\begin{bmatrix}
+    x_{1,1} & x_{1, 2} & \dots  & x_{1, D} \\
+    x_{2, 1} & x_{2, 2} &\dots  & x_{2, D} \\
+    x_{3, 1} & x_{3, 2} &\dots  & x_{3, D} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    x_{N, 1} & x_{N, 2} & \dots  & x_{N, D}
+\end{bmatrix} = \transpose{\mat{X}} \mat{X}
+\end{equation}
+Sigma issue is easily solved because they are tied to the $X$ matrix, we just need to insert diagonal matrix whose elements are, respectively: $\logfun \cdot (1-\logfun)$. Hence, Hessian becomes $H(NLL(\vect{y}|\mat{X}, \vect{w})) = \transpose{\mat{X}}\cdot \mat{S} \cdot \mat{X}$, where $\mat{S}$ is diagonal matrix whose elements are described, previously.
+\\
+In order to prove that Hessian is positive-semi definite we have to prove that for every vector $\vect{z}$ from $\mathbb{R}^D$ in :
+\begin{align}
+\vect{z}\transpose{\mat{X}}\mat{D}\mat{X}\transpose{\vect{z}} \geq 0 \iff \nonumber \\
+\transpose{(\mat{X}\transpose{\vect{z}})}\mat{D}\mat{X}\transpose{\vect{z}} \geq 0 \iff \label{eq:transposeLaw}\\
+\transpose{(\mat{X}\transpose{\vect{z}})}\sqrt{\mat{D}}\sqrt{\mat{D}}\mat{X}\transpose{\vect{z}} \geq 0 \label{eq:square}\iff\\
+\transpose{(\sqrt{\mat{D}}\mat{X}\transpose{\vect{z}})}(\sqrt{\mat{D}}\mat{X}\transpose{\vect{z}}) \geq 0 \iff \label{eq:transposeLaw2} \\
+||\sqrt{\mat{D}}\mat{X}\transpose{\vect{z}}||_2^2 \geq 0 \label{eq:final}
+\end{align}
+The equation \ref{eq:transposeLaw} is the simple usage of property of transposition of matrices. The equation \ref{eq:square} is possible because the entries of diagonal matrix are positive due to the fact that $\logfun$ is in segment $(0, 1)$, and $1-\logfun$ is in $(0, 1)$ and we are always able to calculate square roots of diagonal entries since product of values of two positive functions is strictly positive. The equation \ref{eq:transposeLaw2} is the simple usage of property of transposition of matrices. The final equation \ref{eq:final} gives is possible because norm of the vector $\vect{x}$ is equal to $\transpose{\vect{X}}\vect{X}$. Further, Eucledian norm is always positive, and this concludes the proof.
+\item[4.] 
+I would use Newton update rule. Derivations are given on the lectures:
+$$\vect{w}_{t+1}=(\transpose{\mat{X}}\mat{D}_t\mat{X})^{-1}\transpose{\mat{X}}\mat{D}_t(\mat{X}\vect{w}_t + \mat{D}_t^{-1}(\vect{y}-\sigma(\mat{X} \vect{w}))$$ 
+The obtained solution would be correct because Hessian is semidefinite positive, and thus negative log likelihood will be convex function. The only problem with this approach is it would take immense amount of time, because of the calculations, and the problem should be reformulated.
+\end{enumerate}
+
+\item[3.]
+\begin{enumerate}
+\item[3.1]
+Because data set is linearly separable, $\alpha > 0$.
+Let us assume there is tuple $(\vect{w}^*, w_0^*)$ and $||\vect{w}^*|| = \beta < 1$ and it satisfies the solution. By dividing both sides of inequality by $\beta$ for $i\in \{ 1, ..., N\}$ inequalities hold, but on the rhs of inequalities we have $\frac{\alpha}{\beta} > \alpha$ and $\frac{||\vect{w}^*||}{|\beta||} = 1$. Hence, we have a solution that maximizes $\alpha$ that is not $\vect{w}^*.$ Contradiction! This means $||\vect{w}||=1$ holds for the solution of the program. \\
+If we divide inequalities in the task paper formulation by $\alpha$ they are transformed into:
+$$y_i(\vect{x}_i\cdot \frac{\vect{w}}{\alpha} + \frac{w_0}{\alpha})\geq 1,\, i\in \{1, ..., N\}$$ Thus we need to maximize $\alpha$ or in our case to minimize $\frac{\vect{w}}{\alpha}$. If we change $(\frac{\vect{w}}{\alpha}, \frac{w_0}{\alpha})$ with $(\hat{\vect{w}}, \hat{w_0})$, we get that our objective is to minimize $\frac{1}{\alpha} = ||\hat{\vect{w}}||$ (norm of solution of $\vect{w}$ is 1, which we get from the previous part of the task) which is equivalent to the formulation in the lectures. $w_0$ is not part of the norm of $||\vect{w}||$, this guarantees that we could set it as much as we want to "lower" the influence of $\alpha$ on inequalities. 
+\item[3.2]
+\begin{enumerate}
+\item[1.]
+Maximum number of support vectors is $N$, because if all the points from one and the other set are located on two distinct coordinates then the support vectors will be formed from the full set of points. Minimum number of support vectors is 2. If we have all the aligned on the line, with points from one class on one side of the line, and the points from the other class on the other side of the line, then hyperplane that would separate the classes is limited by two "closest" points from different sets and they are at the same time support vectors.
+\item[2.]
+First we will prove that optimal solution in linearly separable formulation of the algorithm satisfies the formulation for non-separable case formulation. Setting up $\zeta_i = 0$, we see that we get the same quadratic program as for linearly separable case, and an optimal solution is the solution because of the formulation of the task. Further, assume there is some solution where all $\zeta_i > 1$. This is incorrect because it would mean lhs of inequalities is negative, because otherwise the optimal solution of linearly separable algorithm is the one. Further as lhs is negative, this means data is not linearly separable. 
+\end{enumerate}
+\end{enumerate}
+\item[4.]
+\begin{enumerate}
+\item[1.]
+\begin{align}
+\vect{w}=\transpose{\mat{X}}\lambda^{-1}(\vect{y}-\mat{X}\vect{w}) \nonumber\iff\\
+\vect{w}=\transpose{\mat{X}}\lambda^{-1}\vect{y}-
+\transpose{\mat{X}}\lambda^{-1}\mat{X}\vect{w} \iff \label{eq:math}\\
+(\mat{I}_D + \transpose{\mat{X}}\lambda^{-1}\mat{X})\vect{w}=\transpose{\mat{X}}\lambda^{-1}\vect{y} \label{eq:math2}\iff \\
+(\lambda\mat{I}_D + \transpose{\mat{X}}\mat{X})\vect{w}=\transpose{\mat{X}}\vect{y}\label{eq:math3}
+\end{align}
+The equation \ref{eq:math}, \ref{eq:math2}, \ref{eq:math3} because we use simple vector spaces of matrices properties (distributivity, division by scalar).
+\item[2.]
+
+\begin{align}
+(\mat{X}\transpose{\mat{X}} + \lambda \mat{I}_D)\transpose{\mat{X}}( \mat{X} \transpose{\mat{X}}  + \lambda \mat{I}_N)^{-1}\vect{y} = 
+\transpose{\mat{X}}\vect{y} \iff  \label{eq:first}\\
+(\mat{X}\transpose{\mat{X}} + \lambda \mat{I}_D)\transpose{\mat{X}}( \mat{X} \transpose{\mat{X}}  + \lambda \mat{I}_N)^{-1} = 
+\transpose{\mat{X}} \iff \label{eq:yNotZero}\\
+(\mat{X}\transpose{\mat{X}} + \lambda \mat{I}_D)\transpose{\mat{X}} = 
+\transpose{\mat{X}} ( \mat{X} \transpose{\mat{X}}  + \lambda \mat{I}_N)\iff \label{eq:inv}\\
+\mat{X}\transpose{\mat{X}}\transpose{\mat{X}}  + \lambda \transpose{\mat{X}}= 
+\transpose{\mat{X}}  \mat{X} \transpose{\mat{X}}  + \lambda \transpose{\mat{X}}\iff \label{eq:simpleMul}\\
+\mat{X}\transpose{\mat{X}}\transpose{\mat{X}} = 
+\transpose{\mat{X}}  \mat{X} \transpose{\mat{X}} \iff \label{eq:simpleMul2}\\
+\mat{X}\transpose{\mat{X}} = \transpose{\mat{X}}  \mat{X} \label{eq:final}
+\end{align}
+The equation \ref{eq:first} is the starting assumption. The equation \ref{eq:yNotZero} is correct or $\vect{y}$ is zero vector. If $y$ is zero vector we do not need to prove further; If $y$ is not zero than we have this equation. The equation \ref{eq:inv} is correct because $\mat{X} \transpose{\mat{X}}  + \lambda \mat{I}_N$ has determinant different than zero. The equations \ref{eq:simpleMul} and \ref{eq:simpleMul2} use simple matrix calculations. The equation \ref{eq:final} is correct because matrix multiplication in this case produces symmetric matrix. Besides, if $\mat{X}$ was 0, this would still hold.
+Thus, our $\vect{w}$ satisfies the beginning condition and it is a solution of normal equation.  
+
+\end{enumerate}
 \end{enumerate}
 
 \end{document}
