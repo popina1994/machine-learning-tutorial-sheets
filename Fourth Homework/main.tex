@@ -1,0 +1,162 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage{bm}
+\usepackage{tikz}
+\pagestyle{empty}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\author{Djordje Zivanovic}
+\title{Second Homework from Machine Learning}
+
+\begin{document}
+
+\centerline{\large \bf Machine learning : Sheet 4}
+\centerline{\large Author : Djordje Zivanovic}
+\bigskip
+%Chapter 1 in Ockendon \& Tayler: Applied PDE's  
+%{\it Maths Institute Lecture Notes}. 	
+%{\bf Exercises 1, 2, 4, 5}.
+\newcommand{\transpose}[1]{#1 ^ \text{T}}
+\newcommand{\mat}[1]{\textbf{\text{{#1}}}}
+\newcommand{\vect}[1]{\mat{#1}}
+\newcommand{\gradient}[1]{\nabla_{\vect{#1}}}
+\newcommand{\der}[1]{\frac{\partial}{\partial #1}}
+\newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand{\logfun}{\sigma(\transpose{\vect{x}}_i \vect{w})}
+\newcommand{\softmaxi}{\frac{e^{z_i}}{\sum_{l=1}^Ce^{z_l}}}
+\newcommand{\layersep}{2.5cm}
+\begin{enumerate}
+\item 
+\begin{align}
+\frac{\partial \ell (\mat{W}, \vect{b}, \vect{x}, y)}{\partial \vect{a}} 
+&= -\frac{\partial \log a_y}{\partial \vect{a}} \label{eq:logDef}\\
+&= \left[ -\frac{\partial \log a_y}{\partial a_1}, ..., -\frac{\partial \log a_y}{\partial a_y}, ..., -\frac{\partial \log a_y}{\partial a_C}  \right] \label{eq:gradDef}\\
+&= \left[0, ..., -\frac{1}{a_y}, ..., 0\right] \label{eq:derLog}
+\end{align}
+The equation \ref{eq:logDef} is a definition of the objective function for a given point. The equation \ref{eq:gradDef} is a definition of a gradient of a scalar function (derivative of scalar by a vector). The equation \ref{eq:derLog} uses property of derivative of a logarithm function.
+\begin{align}
+\frac{\partial \ell (\mat{W}, \vect{b}, \vect{x}, y)}{\partial \vect{z}} 
+&=\frac{\partial \ell (\mat{W}, \vect{b}, \vect{x}, y)}{\partial \vect{a}}
+\cdot \frac{\partial \vect{a}}{\partial \vect{z}}   \label{eq:defDer}
+\end{align}
+From the equation \ref{eq:defDer} we can see that we need to calculate $\frac{\partial\vect{a}}{\partial\vect{z}}$
+\begin{align}
+\frac{\partial \vect{a}}{\partial \vect{z}} 
+&=\frac{\partial \left[ \frac{ e^{z_{1}}}{\sum_{l=1}^{C}e^{z_{l}}}, ..., \frac{ e^{z_{i}}}{\sum_{l=1}^{C}e^{z_{l}}},..., \frac{ e^{z_{C}}}{\sum_{l=1}^{C}e^{z_{l}}} \right]}{\partial \vect{z}}\\
+&=\begin{bmatrix}
+    \frac{\partial \frac{ e^{z_{1}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_1}     & 
+    \frac{\partial \frac{ e^{z_{1}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_2}     &  & \dots & \frac{\partial \frac{ e^{z_{1}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_C} \\
+    \frac{\partial \frac{ e^{z_{2}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_1}     & 
+    \frac{\partial \frac{ e^{z_{2}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_2}     &  & \dots & \frac{\partial \frac{ e^{z_{2}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_C} \\
+    \hdotsfor{5} \\
+    \frac{\partial \frac{ e^{z_{C}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_1}     & 
+    \frac{\partial \frac{ e^{z_{C}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_2}     &  & \dots & \frac{\partial \frac{ e^{z_{C}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_C} \\
+\end{bmatrix} \label{eq:matrix}\\
+\end{align}
+
+Let us denote $$S_i = \frac{ e^{z_{i}}}{\sum_{l=1}^{C}e^{z_{l}}}$$
+Then the equation \ref{eq:matrix} becomes:
+\begin{align}
+\begin{bmatrix}
+    \frac{\partial S_1}{\partial z_1}     & 
+    \frac{\partial S_1}{\partial z_2}      &  & \dots & \frac{\partial S_1}{\partial z_1}  \\
+    \frac{\partial S_2}{\partial z_1}     & 
+    \frac{\partial S_2}{\partial z_2}      &  & \dots & \frac{\partial S_2}{\partial z_C}\\
+    \hdotsfor{5} \\
+    \frac{\partial S_C}{\partial z_1}     & 
+    \frac{\partial S_C}{\partial z_2}      &  & \dots & \frac{\partial S_C}{\partial z_C}\\
+\end{bmatrix}\label{eq:matrix2}
+\end{align}
+In the equation \ref{eq:matrix2} we notice that we have only two "different" type of derivatives, $\frac{\partial S_i}{\partial z_i}, i \in \{ 1, ..., C\}$ and $\frac{\partial S_i}{\partial z_j}, i \ne j, i \in \{ 1, ..., C\}, j \in \{ 1, ..., C\}$.
+\begin{align}
+\frac{\partial S_i}{\partial z_i} &= 
+\frac{\frac{ e^{z_{i}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_i}\\
+&= \frac{e^{z_{i}} \cdot \sum_{l=1}^{C}e^{z_{l}} - e^{z_{i}} e^{z_{i}}}
+{\left(\sum_{l=1}^{C}e^{z_{l}}\right)^2}\\
+&= \frac{e^{z_{i}} \cdot \left(\sum_{l=1}^{C}e^{z_{l}} -  e^{z_{i}}\right)}
+{\left(\sum_{l=1}^{C}e^{z_{l}}\right)^2}\\
+&= \frac{e^{z_{i}}}{\sum_{l=1}^{C}e^{z_{l}}}\frac{ \sum_{l=1}^{C}e^{z_{l}} -  e^{z_{i}}}
+{\sum_{l=1}^{C}e^{z_{l}}}\\
+&= S_i \cdot (1 - S_i)
+\end{align}
+\begin{align}
+\frac{\partial S_i}{\partial z_j} &= 
+\frac{\partial \frac{ e^{z_{i}}}{\sum_{l=1}^{C}e^{z_{l}}}}{\partial z_j}\\
+&=-\frac{e^{z_{i}}\cdot e^{z_{j}}}{\left(\sum_{l=1}^{C}e^{z_{l}}\right)^2}\\
+&= -S_i \cdot S_j
+\end{align}
+Finally  we have:
+\begin{align}
+\frac{\partial \vect{a}}{\partial \vect{z}}  &=
+\begin{bmatrix}
+    \frac{\partial S_1}{\partial z_1}     & 
+    \frac{\partial S_1}{\partial z_2}      &  & \dots & \frac{\partial S_1}{\partial z_1}  \\
+    \frac{\partial S_2}{\partial z_1}     & 
+    \frac{\partial S_2}{\partial z_2}      &  & \dots & \frac{\partial S_2}{\partial z_C}\\
+    \hdotsfor{5} \\
+    \frac{\partial S_C}{\partial z_1}     & 
+    \frac{\partial S_C}{\partial z_2}      &  & \dots & \frac{\partial S_C}{\partial z_C}\\
+\end{bmatrix} \nonumber \\
+&=
+\begin{bmatrix}
+    S_1 \cdot (1- S_1)    & 
+-S_1 \cdot S_2      &  & \dots & -S_1\cdot S_C \\
+- S_2 \cdot S_1    & 
+S_2 \cdot (1 - S_2)      &  & \dots & -S_2 \cdot S_C \\
+    \hdotsfor{5} \\
+        -S_C \cdot S_1    & 
+-S_C \cdot S_1      &  & \dots & S_C \cdot (1 - S_C) \\
+\end{bmatrix}
+\end{align}
+Further we have:
+\begin{align}
+\frac{\partial \ell(\mat{W}, \vect{b}, \vect{x}, y)}{\partial \vect{z}} &=
+\frac{\partial \ell (\mat{W}, \vect{b}, \vect{x}, y)}{\partial \vect{a}}
+\cdot \frac{\partial \vect{a}}{\partial \vect{z}}\\
+&= \left[0, ..., -\frac{1}{a_y}, ..., 0\right] \cdot 
+\begin{bmatrix}
+    S_1 \cdot (1- S_1)    & 
+-S_1 \cdot S_2      &  & \dots & -S_1\cdot S_C \\
+- S_2 \cdot S_1    & 
+S_2 \cdot (1 - S_2)      &  & \dots & -S_2 \cdot S_C \\
+    \hdotsfor{5} \\
+        -S_C \cdot S_1    & 
+-S_C \cdot S_1      &  & \dots & S_C \cdot (1 - S_C) \\
+\end{bmatrix}\\
+&= \left[ \frac{S_y\cdot S_1 }{a_y},\frac{S_y \cdot S_2 }{a_y}, \dots, \frac{S_y \cdot (S_y - 1) }{a_y}, \dots, \frac{S_y \cdot S_C }{a_y}\right]\\
+&=  \left[ S_1 ,S_2, \dots, S_y - 1 \dots, S_C \right]
+\end{align}
+From the formula $\frac { \partial \ell } { \partial w _ { i j } ^ { 2 } } = \frac { \partial \ell } { \partial z _ { i } ^ { 2 } } \cdot \frac { \partial z _ { i } ^ { 2 } } { \partial w _ { i j } ^ { 2 } } = \frac { \partial \ell } { \partial z _ { i } ^ { 2 } } \cdot x _ { j }$ we get:
+\begin{align}
+\frac{\partial \ell (\mat{W}, \vect{b}, \vect{x}, y)}{\partial \mat{W}} 
+&=\transpose{\left( \vect{x} \frac{\partial \ell}{\partial \vect{z}}\right)}\\
+&=\begin{bmatrix}
+    x_1 \cdot S_1   & 
+x_2 \cdot S_1      &  & \dots  & x_D\cdot S_1 \\
+ x_1 \cdot S_2    & 
+x_2 \cdot S_2 &  & \dots & x_D \cdot S_2 \\
+    \hdotsfor{5} \\
+     x_1 \cdot (S_y -1)    & 
+x_2 \cdot (S_y -1) &  & \dots & x_D \cdot (S_y -1) \\
+    \hdotsfor{5} \\
+        x_1 \cdot S_C    & 
+x_2 \cdot S_C &     &  \dots& x_D \cdot  S_C \\
+\end{bmatrix}\\
+\end{align}
+\begin{align}
+\frac{\partial \ell(\mat{W}, \vect{b}, \vect{x}, y)}{\partial \vect{b}} &=
+\frac{\partial \ell (\mat{W}, \vect{b}, \vect{x}, y)}{\partial \vect{z}}
+\cdot \frac{\partial \vect{z}}{\partial \vect{b}}
+\end{align}
+If we notice that $\frac{\partial \vect{z}}{\partial \vect{b}}$ is an identity matrix, from the equation we get that $\frac{\partial \ell(\mat{W}, \vect{b}, \vect{x}, y)}{\partial \vect{b}}$ is the same as $\frac{\partial \ell(\mat{W}, \vect{b}, \vect{x}, y)}{\partial \vect{z}}$.
+
+$$\mat{W}_{t+1} = \mat{W}_t - \sum_{i=1}^N\frac{\partial \ell(\vect{x}_i, y_i, \mat{W}_t, \vect{b}_t)}{\partial \mat{w}}$$
+$$\vect{b}_{t+1} = \vect{b}_t - \sum_{i=1}^N\frac{\partial \ell(\vect{x}_i, y_i, \mat{W}_t, \vect{b}_t)}{\partial \vect{b}}$$
+\end{enumerate}
+
+\end{document}
