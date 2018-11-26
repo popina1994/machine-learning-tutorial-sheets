@@ -8,6 +8,7 @@
 \usepackage{lmodern}
 \usepackage{bm}
 \usepackage{tikz}
+\usetikzlibrary{calc}
 \pagestyle{empty}
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
 \author{Djordje Zivanovic}
@@ -30,6 +31,9 @@
 \newcommand{\logfun}{\sigma(\transpose{\vect{x}}_i \vect{w})}
 \newcommand{\softmaxi}{\frac{e^{z_i}}{\sum_{l=1}^Ce^{z_l}}}
 \newcommand{\layersep}{2.5cm}
+\newcommand{\layersepH}{6cm}
+\newcommand{\layersepP}{7cm}
+\newcommand{\layersepB}{9cm}
 \begin{enumerate}
 \item 
 \begin{align}
@@ -177,8 +181,107 @@ We just need to adjust orientation of $\vect{b}$ and the derivative in the last 
 \item 
 \begin{enumerate}
 \item [1.]
+I do not agree with the suggestion for several reasons. Let us notice that loss function of one training example $(\hat{\vect{y}_i}-\vect{y}_i)^2$ is just a sum of squares of errors (component-wise) of wrongly calculated outputs. The first reason is that in the binary coding approach not all errors are equal. If we encode 0 as 0000 and our neural network outputs 7, the error will be 3. On the other hand for the output 1 the error will be 1. This means, not all errors are equal, and they are related to the encoding. This could lead to unnecessarily longer training. Moreover, it could lead to stimulating errors with "lower" value in order to decrease the number of errors with bigger values.\\
+The next problem is that our algorithm even when it is trained properly it could classify something incorrectly. For example in one hot encoding output with two ones is incorrect (we know there is some problem by seeing the output). On the other hand, in binary encoding we do not have "obvious" errors in encoding, because all outputs are valid (except the encodings for numbers bigger than 10).
+The final problem is that it could stimulate some neurons to have lower values because specific digit in encoding is not frequent enough. For example the first digit in binary encoding appears only in 2 numbers (9 and 10), but the network may believe it is not so important and it could decrease the value. 
 \item [2.]
+
+\begin{figure}
+\centering
+
+\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep]
+    \tikzstyle{every pin edge}=[<-,shorten <=1pt]
+    \tikzstyle{neuron}=[circle,fill=black!25,minimum size=17pt,inner sep=0pt]
+    \tikzstyle{input neuron}=[neuron, fill=green!50];
+    \tikzstyle{output neuron}=[neuron, fill=red!50];
+    \tikzstyle{hidden neuron}=[neuron, fill=blue!50];
+    \tikzstyle{power neuron}=[neuron, fill=yellow!50];
+    \tikzstyle{binary neuron}=[neuron, fill=cyan!50];
+    \tikzstyle{annot} = [text width=4em, text centered]
+
+    % Draw the input layer nodes
+    \foreach \name / \y in {1,2,3}
+    % This is the same as writing \foreach \name / \y in {1/1,2/2,3/3,4/4}
+        \node[input neuron, pin=left:Input \#\y](\y) (I-\name) at (0,-\y) {$x_\y$};
+    \edef\mya{782}
+    \foreach \name / \y in {5,6,7}
+    	\pgfmathparse{int(\mya+1)}
+    	\xdef\mya{\pgfmathresult}
+    % This is the same as writing \foreach \name / \y in {1/1,2/2,3/3,4/4}
+        \node[input neuron, pin=left:Input \#\y](\y) (I-\name) at (0,-\y) {$x_{\mya}$};
+	\foreach \name / \y in {4}	
+		\node[] at (0,-\y) {$\vdots$};
+	% Draw the input layer nodes
+ 
+    % Draw the hidden layer nodes
+    \edef\ya{0}
+    \foreach \name / \y in {1,...,15}
+    	\pgfmathparse{\ya+0.6}
+    	\xdef\ya{\pgfmathresult}
+        \path[yshift=0.5cm]
+            node[hidden neuron] (H-\name) at (\layersep,-\ya cm) {};
+	
+
+    % Draw the output layer node
+	\edef\ya{0}
+    \foreach \name / \y in {1,...,10}
+    	\pgfmathparse{\ya+0.6}
+    	\xdef\ya{\pgfmathresult}
+    	\path[yshift=-0.7cm]
+   	 		node[output neuron] (O-\name) at (\layersepH, -\ya cm) {$y_{\y}$};
+	
+	 % Draw the pow layer node
+	\edef\ya{0}
+    \foreach \name / \y in {1,...,10}
+    	\pgfmathparse{\ya+0.6}
+    	\xdef\ya{\pgfmathresult}
+    	\path[yshift=-0.7cm]
+   	 		node[power neuron] (P-\name) at (\layersepP, -\ya cm) {$p_{\y}$};	
+	
+	% Draw the binary layer node
+	\edef\ya{2}
+    \foreach \name / \y in {1,...,4}
+    	\pgfmathparse{\ya+0.6}
+    	\xdef\ya{\pgfmathresult}
+    	\path[yshift=-0.7cm]
+   	 		node[binary neuron, pin={[pin edge={->}]right:Output}] (B-\name) at (\layersepB, -\ya cm) {$d_{\y}$};	
+	
+    % Connect every node in the input layer with every node in the
+    % hidden layer.
+    \foreach \source in {1,2, 3, 5, 6, 7}
+        \foreach \dest in {1,...,15}
+            \path (I-\source) edge (H-\dest);
+
+    % Connect every node in the hidden layer with the output layer
+    \foreach \source in {1,...,15}
+	    \foreach \dest in {1,...,10}
+    	    \path (H-\source) edge (O-\dest);
+    
+ 	% Connect every node in the output layer with the hidden layer
+    \foreach \source in {1,...,10}
+    	\path (O-\source) edge (P-\source); 
+	\foreach \source in {1,...,10}
+		\foreach \dest in {1,...,4}
+    		\path (P-\source) edge (B-\dest);        
+    
+    % Annotate the layers
+    \node[annot,above of=H-1, node distance=1cm] (hl) {Hidden layer};
+    \node[annot,left of=hl] {Input layer};
+    \node[annot,above of=O-1, node distance=2cm] {One-hot encoded layer};
+    \node[annot,above of=P-1, node distance=1cm] {Power layer};
+    \node[annot,above of=B-1] {Binary layer};
+\end{tikzpicture}
+\caption{Neural network that transforms one hot-encoded output to binary output}
+\label{fig:NNPow}
+\end{figure}
+On the figure \ref{fig:NNPow} is shown the neural network that fulfills requested in the task. $p_i(x) = bs(x - p)$ is the activation function, which for $x> p$ returns 1, and for $x\leq p$ returns 0. We choose $p$ that suits the best, $p=0.5$ is a reasonable choice. Further, weight $(p_i, d_j)$ is 1 only in those cases where in binary representation of number $i$ on $j$-th place is 1. So for example for $p_7$ the weights towards $d_1, d_2, d_3, d_4$ will be $1, 1, 1, 0$, for $p_9$ the weights will be $1, 0, 0, 1$ etc. We can say we added two additional layers, because power layer has just activation functions binary step, and the input weights are all one. The output layer is just linear activation function, whose weights are previously stated. Why the network gives the correct output is obvious, because only in cases where $y_i>p$ $p_i$-th node will be 1, and further binary layer will generate corresponding representation of the $i$-th number. 
 \item [3.]
+The same problem as for the first subproblem of this problem, because we minimize the objective functions, thus the different errors will have the different influence on nodes. 
+\end{enumerate}
+
+\begin{enumerate}
+\item[1.]
+sdfsdfdf
 \end{enumerate}
 \end{enumerate}
 
