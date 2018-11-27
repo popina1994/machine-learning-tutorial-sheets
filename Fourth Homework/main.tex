@@ -1,5 +1,6 @@
 \documentclass[10pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -9,15 +10,11 @@
 \usepackage{bm}
 \usepackage{tikz}
 \usetikzlibrary{calc}
-\pagestyle{empty}
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
 \author{Djordje Zivanovic}
-\title{Second Homework from Machine Learning}
-
+\title{\textbf{Machine Learning: Sheet 4}}
 \begin{document}
-
-\centerline{\large \bf Machine learning : Sheet 4}
-\centerline{\large Author : Djordje Zivanovic}
+\maketitle
 \bigskip
 %Chapter 1 in Ockendon \& Tayler: Applied PDE's  
 %{\it Maths Institute Lecture Notes}. 	
@@ -203,7 +200,7 @@ The final problem is that it could stimulate some neurons to have lower values b
     \foreach \name / \y in {1,2,3}
     % This is the same as writing \foreach \name / \y in {1/1,2/2,3/3,4/4}
         \node[input neuron, pin=left:Input \#\y](\y) (I-\name) at (0,-\y) {$x_\y$};
-    \edef\mya{782}
+    \edef\mya{781}
     \foreach \name / \y in {5,6,7}
     	\pgfmathparse{int(\mya+1)}
     	\xdef\mya{\pgfmathresult}
@@ -278,10 +275,108 @@ On the figure \ref{fig:NNPow} is shown the neural network that fulfills requeste
 \item [3.]
 The same problem as for the first subproblem of this problem, because we minimize the objective functions, thus the different errors will have the different influence on nodes. 
 \end{enumerate}
-
+\item
 \begin{enumerate}
 \item[1.]
-sdfsdfdf
+We have the following equations for new neural network further called NNH1. The other neural network (without hidden layer) will be called NNH0. 
+
+The forward equations for NNH0 are:
+\begin{align}
+\vect{z}^1 &= \vect{a}^1 = \vect{x} \label{eq:a1}\\
+\vect{z}^2&=\mat{W}^2\vect{a}^1+\vect{b}^2 \label{eq:z2}\\
+\vect{z}^2 &= \mat{W}^2\vect{x}+\vect{b}^2 \label{eq:fullz2}\\
+\vect{a}^2 &=\text{softmax}(\vect{z}^2) \label{eq:a2}
+\end{align}
+
+The forward equations for NNH1 are:
+\begin{align}
+\vect{z}^1 &= \vect{a}^1 = \vect{x} \label{eq:a1h}\\
+\vect{z}^2&=\mat{W}^2\vect{a}^1+\vect{b}^2 \label{eq:z2h}\\
+\vect{a}^2 &= \vect{z}^2 \label{eq:a2h}\\
+\vect{z}^3&=\mat{W}^3\vect{a}^2+\vect{b}^3 \label{eq:z3h}\\
+\vect{z}^3 &= \mat{W}^3\mat{W}^2\vect{x}+\mat{W}^3\vect{b}^2 + \vect{b}^3 \label{eq:fullz3h}\\
+\vect{a}^3 &=\text{softmax}(\vect{z}^3) \label{eq:a3h}
+\end{align}
+Assume NNH1 has some representation that cannot be represented using NNH0. This would mean there is some combination on input $\vect{x}$ that doesn't give the same output. But this is incorrect because if we set $\mat{W}^2$ in NNH0 to be $\mat{W}^3\mat{W}^2$ from NNH1 and set $\mat{b}^2$ from NNH0 to be $\mat{W}^3\vect{b}^2 + \vect{b}^3$ from the NNH1, we get that $\vect{z}^2$ from NNH0 will always have the same values as $\vect{z}^3$ from NNH1. Thus, the assumption is incorrect. \\
+Assume NNH0 has some representation that cannot be represented using NNH1. If we set up $\vect{b}^2$ from NNH1 to be zero vector and $\vect{b}^3$ from NNH1 to be $\vect{b}^2$ from NNH0 and $\mat{W}^3$ and $\mat{W}^2$ from NNH1 to be:
+$$\mat{W}^3= 
+\begin{bmatrix}
+    1 & 0 & 0 & \dots & 0 & 0 &0& \dots & 0 & 0\\
+    0 & 1 & 0 & \dots & 0 & 0 &0& \dots & 0 & 0\\
+    0 & 0 & 1 & \dots & 0 & 0 &0& \dots & 0 & 0\\
+   \vdots & \vdots  & \vdots  & \vdots  & \vdots  & \vdots & \vdots& \vdots & \vdots& \vdots  \\
+    0 & 0 &  & \dots & 1& 0  &0& \dots & 0 & 0\\
+	0 & 0 & 0 & \dots & 0 & 1 &0  & \dots & 0 & 0\\             
+\end{bmatrix}
+,
+\mat{W}^2= 
+\begin{bmatrix}
+    w_{1, 1} & w_{1, 2} & w_{1, 3} & \dots & w_{1, 783} & w_{1, 784} \\
+    w_{2,1} & w_{2, 2} & w_{2, 3} & \dots & w_{2, 783} & w_{2, 784} \\
+    w_{3,1} & w_{3, 3} & w_{3, 3} & \dots & w_{3, 783} & w_{3, 784} \\
+   \vdots & \vdots  & \vdots  & \vdots  & \vdots  & \vdots  \\
+    w_{9,1} & w_{9, 2} & w_{9, 3} & \dots & w_{9, 783} & w_{9, 784} \\
+	w_{10,1} & w_{10, 2} & w_{10, 3} & \dots & w_{109, 783} & w_{10, 784} \\
+    0 & 0 & 0 & \dots & 0 & 0  \\
+    0 & 0 & 0 & \dots & 0 & 0  \\
+    \vdots & \vdots  & \vdots  & \vdots  & \vdots  & \vdots  \\
+	0 & 0 & 0 & \dots & 0 & 0  \\                
+\end{bmatrix}, $$
+where $w_{i, j} $ in $\mat{W}^2$ is corresponding $w$ from $\mat{W}^2$ from NNH0 we will get that our assumption is incorrect. We see that $\mat{W}^3$ is "expanded" identity matrix. Dimensions of identity matrix are $10 \times 10$ (without "unnecessary zeros"), and $\mat{W}^2$ is "expanded" $\mat{W}^2$ from NNH0 matrix. If we multiply these matrices, we will get the same $\mat{W}^2$ from NNH0.
+\\
+This means our models can represent the same relationships between inputs and outputs. 
+\item[2.]
+
+$\vect{z}^2$ in  NNH0 has stronger representation abilities than NNH1 for some weights, but NNH1 doesn't have stronger for some combinations. The part that all representations of weights from NNH1 can be represented using weights from NNH0 is the same as in the previous subproblem.\\
+$\mat{W}^2$ and $\mat{W}^3$ are two matrices of dimensions $10\times 4$ and $4 \times 784$. Because there is unlimited number of inputs, and there  are limited number of parameters - weights and biases from NNH1 that could map these inputs - as in the previous problem a product of these two matrices has to be $\mat{W}^2$ from NNH0. But this is problematic because this means we would need to have decomposition of a matrix of dimensions $784\times10$ whose rank can be bigger than 4, into the product of two matrices of rank the most 4. This is impossible for all matrices of $\mat{W}^2$ (Echart-Young theorem).
+\\ The last question is what about softmax functions, maybe distinct inputs give as the result the same vector? This is impossible because, if we fix all outputs except one, the function will be monotonically increasing. This means function is increasing for all inputs (variables). Thus the function always generate unique values, and inputs have to be the same.   
+\item[3.]
+Let us assume that the cross entropy loss function is convex. Then let $(\mat{W}^{2:3*}, \vect{b}^{2:3*})$ be a minimal solution. This minimal solution and other ones have to give unique output values (convexity consequence). If we swap units (neurons) in the same layers, we will still have the same network, and the minimal solution will be the same. But because we swapped the units, we are allowed to swap weights belonging to swapped units going out of the same inputs and we now have a new solution that is minimal, but not the one from beginning. This means in some segment weights of a neural network need to generate the same values. Otherwise there would be a gap between two minimal solutions and all points between them would be above hyperplane that these two solutions would form. (this could be written $f(\lambda w_l + (1-\lambda )w_m, ...)\leq \lambda f(w_l, ...) + (1-\lambda)f(w_m) \leq f(w_m)$ which is not true, because $f(w_m,....)$ is minimal solution). This would mean our function is concave, which is not what we assumed. 
+\\ 
+Hence, our weights generate the same loss function values in specific segments. Due to previous, for the NN given in text we can notice that all the way up to softmax we will have the same values at each output of neurons in the same layer, for minimal solution. This means minimal cross entropy has a value $$-\log \frac{e^{z_y}}{\sum_{l=1}^Ce^{z_l}}=-\log \frac{1}{C} = \log C$$ 
+But if we take a solution where all the values of weights and biases coming to other outputs except $C$ are 0, and ones coming to $C$ are 1 (between input and hidden layer is unimportant, set them to positive) then we will have loss function whose value is 0 and that is less than our function. This is contradiction, because we assumed our minimal solution is minimal and outputs the unique value, which it does not. 
+\\Hence, we cannot get a convex optimization problem.
+\end{enumerate}
+\item
+\begin{enumerate}
+\item[1.]
+\begin{align*}
+a_0^1&= z_0^1=x \\
+z_0^2&=b_0^2+w+{00}^2x\\
+z_1^2&=b_1^2+w_{10}^2x\\
+a_0^2&=\max(0, z_0^2)=\max(0,b_0^2+w_{00}^2x)\\
+a_1^2&=\max(0, z_1^2)=\max(0, b_1^2+w_{10}^2x)\\
+z_0^3&=a_0^2w_{00}^3+a_1^2w_{01}^3+b_0^3\\
+\hat{y}&=a_0^3=z_0^3= a_0^2w_{00}^3+a_1^2w_{01}^3+b_0^3\\
+&= \max(0, b_0^2+w_{00}^2x)w_{00}^3+\max(0,b_1^2+w_{10}^2x)w_{01}^3+b_0^3			
+\end{align*}
+\item[2.]
+\begin{figure}
+\includegraphics[scale=1]{graph.eps}
+\caption{h(x)}
+\end{figure}
+We can notice that the function 
+$h(x) = \max(0, x-3) - \max(0, x - 4)$.For $x<3$ function is 0, for $x> 4$ function is $x-4 + x-3 = 1$ and for $3\leq x\leq4$  is $x-3$In points $3$ and $4$ it has values $0$ and $1$.
+\item[3.]
+By setting $b_0^2=-c, b_1^2=-d, b_0^3=0, w_{00}^2=1, w_{10}^2=1, w_{00}^3=\frac{1}{d-c}, w_{01}^3=-\frac{1}{d-c}$ we get 
+\begin{align*}
+\hat{y} = \frac{\max(0, x-c)}{d-c} - \frac{\max(0, x-d)}{d-c}.
+\end{align*} 
+For $x<c, \hat{y}=0$. 
+For $c\leq x\leq d$ $\hat{y}=\frac{x-c}{d-c}=\frac{1}{d-c}x - \frac{c}{d-c}$. For $x > d$ we have $\frac{x-c - (x - d)}{d-c}=1$
+\item[4.]
+sdf
+\item[5.]
+Let us notice:
+\begin{align*}
+\hat{y} = b_0^3 + \sum_{i=1}^N\max(0, b_i^2+w_{i0}^2x)w^3_{0i}
+\end{align*}
+If we notice that $ b_i^2+w_{i0}^2x$ are linear functions and they will only cut $x$ axis only once (unless they are parallel, but they won't cut the axis then, or in case when the line is axis, but then it won't have any influence on output because the value is 0). Thus, after the point of intersection (if one exists) their activation functions are either linear or constant. Because we have finite number of neurons, there is a maximal number $x$ in these cuts. After that point all functions will behave in the same way (either as linear function or constant). 
+If we sum functions we will only have $a_ix + c_i$ and some constants. When we group coefficients next to $x$ and replace their sum with $m$ and the sum of constants and $b^3_0$ with $n$ we get the claim from the subproblem.
+\item[6.]
+I wouldn't invest for the following reasons. 
+First, there is an infinite number of prime and composite numbers. Let us assume there is limited number of primes. If we multiple all primes and add 1 to the product, we will get number that is coprime to each of the primes, and thus each of the composite numbers. 
+Because the function generated using types of NNs in this function after some time becomes linear. They cannot derive anything from this function, because it is always increasing at the same pace, but number of prime numbers is unlimited.
 \end{enumerate}
 \end{enumerate}
 
