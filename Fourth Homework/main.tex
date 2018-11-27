@@ -9,6 +9,7 @@
 \usepackage{lmodern}
 \usepackage{bm}
 \usepackage{tikz}
+\usepackage{amsthm}
 \usetikzlibrary{calc}
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
 \author{Djordje Zivanovic}
@@ -31,6 +32,8 @@
 \newcommand{\layersepH}{6cm}
 \newcommand{\layersepP}{7cm}
 \newcommand{\layersepB}{9cm}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
 \begin{enumerate}
 \item 
 \begin{align}
@@ -365,7 +368,35 @@ By setting $b_0^2=-c, b_1^2=-d, b_0^3=0, w_{00}^2=1, w_{10}^2=1, w_{00}^3=\frac{
 For $x<c, \hat{y}=0$. 
 For $c\leq x\leq d$ $\hat{y}=\frac{x-c}{d-c}=\frac{1}{d-c}x - \frac{c}{d-c}$. For $x > d$ we have $\frac{x-c - (x - d)}{d-c}=1$
 \item[4.]
-sdf
+First, let us prove that the $[0, 1]$ can be divided on a finite number of equal length subintervals where the difference between a minimum and maximum function value in that each interval is not bigger than $\varepsilon$.\\
+
+According to the definition of the continuous function: given any $\varepsilon>0$, a $\delta>0$ can be found such that for every $x$ within the neighborhood of $x_0$ of radius $\delta$ ($|x-x_0|<\delta$) such that $|f(x)-f(x_0)|<\varepsilon$. 
+Let us assume otherwise, that  $[0,1]$ cannot be divided into equal length intervals $[0, \delta, ..., \frac{1}{\delta}]$
+whose $|f(x)-f(\frac{i\delta + (i+1)\delta}{2})|<\varepsilon$. 
+
+This means no matter how small $\delta$ we set, there will always exist some $i$ such $|f(x)-f(\frac{i\delta + (i+1)\delta}{2})|\geq \varepsilon$, but this means as $\delta \rightarrow 0$ there will be always some value in $[0,1]$ interval that doesn't fulfill condition of continuality. Contradiction! \\
+Thus, let us divide our $[0,1]$ interval into equal length subintervals with $\delta$ that such that   $$\left|f(x)-f\left(\frac{i\delta + (i+1)\delta}{2}\right)\right|<\varepsilon, i \in \left\{ 0, , \frac{1-\delta}{\delta}\right\}$$
+
+We will prove that we can make a sliced linear function in such a way that it traverses through these limitations (which in reality are rectangles), and changes its shape at the beginning of each subinterval.
+Because the function that we need to approximate is bounded and it can be negative, first, we will set $b_0^3$ such that $f(x)+b_0^3$ is always positive (in the worst case $b_0^3 = c$), this will be called $f_{positive}$. This means our sliced function has only to approximate positive bounded function. Moreover, if we concentrate on one specific rectangle (subinterval of function $f(x)$), we just need for a part of $h(x)$function to pass through it, so it starts in $f(i\delta)$ and it finishes in $f((i+1)\delta)$. 
+
+\begin{lemma}
+A unit in the hidden layer can produce function such that it has values $0$ before some value $x_0\geq0$ and it behaves as any linear function that passes through $x_0$ after  that. 
+\end{lemma}
+
+\begin{proof}
+Let us denote with $w$ an input weight to this hidden unit, and $b$ a bias and $w_o$ weight to the output layer of this unit.
+For a linear function $kx+n$ to pass through $x_0$: $kx_0 +n = 0$, $k= -\frac{n}{x_0}$.
+Thus we can set $k$ to be positive as much as we want by setting $n$ to negative values.
+This is easily achieved by setting $b=-kx_0$ and setting $w=k$ as we want, and setting $w_o=1$. This only works for $k\geq 0$. If we need to set $k\leq 0$, we  use the same trick with absolute value of $k$ and set $w_0$ to $-1$.
+Thus  $b=-|k|x_0, w=|k|, w_o=sgn(k), k\neq0$, in the second case $ b=|c|, w=0, w_o=sgn(c), k=0$.
+\end{proof}
+
+Using lemma 1 we can just adjust the flow of our function so they "adjust" current linear function so it starts in $f(i\delta)$ and ends in $f((i+1)\delta)$.
+For the first interval using lemma 1 $k = \frac{f(\delta) - f(0)}{\delta}$ and we should increase $b_0^3$ so that $h(0)=f_{positive}(0)$. So until the "end" of the first subinterval our function is in the $\varepsilon$ limits of $f(x)$. When it enters the second subinterval, we need to correct its coefficient in the following way:
+if the desired coefficient for new subinterval is $k_r$ than $k$ in a new unit is $k_r - k_{previous}$, because 
+$(k_r - k_{previous})x + k_{previous} = k_rx $. 
+By applying this rule to every subinterval and generating new units in hidden layer consecutively, we will get the neural network that produces function $h(x)$, which approximates $f(x)$ in limit $\varepsilon$. 
 \item[5.]
 Let us notice:
 \begin{align*}
@@ -375,8 +406,8 @@ If we notice that $ b_i^2+w_{i0}^2x$ are linear functions and they will only cut
 If we sum functions we will only have $a_ix + c_i$ and some constants. When we group coefficients next to $x$ and replace their sum with $m$ and the sum of constants and $b^3_0$ with $n$ we get the claim from the subproblem.
 \item[6.]
 I wouldn't invest for the following reasons. 
-First, there is an infinite number of prime and composite numbers. Let us assume there is limited number of primes. If we multiple all primes and add 1 to the product, we will get number that is coprime to each of the primes, and thus each of the composite numbers. 
-Because the function generated using types of NNs in this function after some time becomes linear. They cannot derive anything from this function, because it is always increasing at the same pace, but number of prime numbers is unlimited.
+First, there is an infinite number of prime and composite numbers. Let us assume there is limited number of primes. If we multiple all primes and add 1 to the product, we will get number that is coprime to each of the primes, and thus each of the composite numbers. \\
+The second, because the function, which is generated using types of NNs in this problem, after some time becomes linear (previous subproblem). They cannot derive anything from this function, because it is always increasing at the same pace, but number of prime numbers is unlimited, as the number of composite numbers.
 \end{enumerate}
 \end{enumerate}
 
