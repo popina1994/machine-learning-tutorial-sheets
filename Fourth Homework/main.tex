@@ -334,10 +334,12 @@ $\vect{z}^2$ in  NNH0 has stronger representation abilities than NNH1 for some w
 $\mat{W}^2$ and $\mat{W}^3$ are two matrices of dimensions $10\times 4$ and $4 \times 784$. Because there is unlimited number of inputs, and there  are limited number of parameters - weights and biases from NNH1 that could map these inputs - as in the previous problem a product of these two matrices has to be $\mat{W}^2$ from NNH0. But this is problematic because this means we would need to have decomposition of a matrix of dimensions $784\times10$ whose rank can be bigger than 4, into the product of two matrices of rank the most 4. This is impossible for all matrices of $\mat{W}^2$ (Echart-Young theorem).
 \\ The last question is what about softmax functions, maybe distinct inputs give as the result the same vector? This is impossible because, if we fix all outputs except one, the function will be monotonically increasing. This means function is increasing for all inputs (variables). Thus the function always generate unique values, and inputs have to be the same.   
 \item[3.]
-Let us assume that the cross entropy loss function is convex. Then let $(\mat{W}^{2:3*}, \vect{b}^{2:3*})$ be a minimal solution. This minimal solution and other ones have to give unique output values (convexity consequence). If we swap units (neurons) in the same layers, we will still have the same network, and the minimal solution will be the same. But because we swapped the units, we are allowed to swap weights belonging to swapped units going out of the same inputs and we now have a new solution that is minimal, but not the one from beginning. This means in some segment weights of a neural network need to generate the same values. Otherwise there would be a gap between two minimal solutions and all points between them would be above hyperplane that these two solutions would form. (this could be written $f(\lambda w_l + (1-\lambda )w_m, ...)\leq \lambda f(w_l, ...) + (1-\lambda)f(w_m) \leq f(w_m)$ which is not true, because $f(w_m,....)$ is minimal solution). This would mean our function is concave, which is not what we assumed. 
+Let us assume that the cross entropy loss function is convex. Then let $(\mat{W}^{2:3*}, \vect{b}^{2:3*})$ be a minimal solution. This minimal solution and other ones have to give unique output values (convexity consequence). 
+If we swap units (neurons) in the same layers, we will still have the same network, and the minimal solution will be the same. But because we swapped the units, we are allowed to swap weights belonging to swapped units going out of the same inputs.
+Now we have a new solution that is minimal, but not the one from beginning. This means in some segment weights of a neural network need to generate the same values (that go from the same input unit). Otherwise there would be a gap between two minimal solutions and all points between them would be above hyperplane that these two solutions would form. (this could be written $f(\lambda w_l + (1-\lambda )w_m, ...)\leq \lambda f(w_l, ...) + (1-\lambda)f(w_m) \leq f(w_m)$ which is not true, because $f(w_m,....)$ is minimal solution). This would mean our function is concave, which is not what we assumed. 
 \\ 
-Hence, our weights generate the same loss function values in specific segments. Due to previous, for the NN given in text we can notice that all the way up to softmax we will have the same values at each output of neurons in the same layer, for minimal solution. This means minimal cross entropy has a value $$-\log \frac{e^{z_y}}{\sum_{l=1}^Ce^{z_l}}=-\log \frac{1}{C} = \log C$$ 
-But if we take a solution where all the values of weights and biases coming to other outputs except $C$ are 0, and ones coming to $C$ are 1 (between input and hidden layer is unimportant, set them to positive) then we will have loss function whose value is 0 and that is less than our function. This is contradiction, because we assumed our minimal solution is minimal and outputs the unique value, which it does not. 
+Hence, our weights generate the same loss function values in specific segments. Due to previous, for the NN given in text we can notice that all the way up to softmax we will have the same values at each output of neurons in the same layer, for minimal solution. This means minimal cross entropy has a value, when we have just one element to train: $$-\log \frac{e^{z_y}}{\sum_{l=1}^Ce^{z_l}}=-\log \frac{1}{C} = \log C$$ 
+But if we take a solution where all the  weights and biases coming to other outputs except $C$ are 0, and ones coming to $C$ are 1 (between input and hidden layer is unimportant, set them to positive numbers) then the loss function will be 0 and that is less than our function. This is contradiction, because we assumed our minimal solution is minimal and outputs the unique value, which it does not. 
 \\Hence, we cannot get a convex optimization problem.
 \end{enumerate}
 \item
@@ -370,7 +372,9 @@ For $c\leq x\leq d$ $\hat{y}=\frac{x-c}{d-c}=\frac{1}{d-c}x - \frac{c}{d-c}$. Fo
 \item[4.]
 First, let us prove that the $[0, 1]$ can be divided on a finite number of equal length subintervals where the difference between a minimum and maximum function value in that each interval is not bigger than $\varepsilon$.\\
 
-According to the definition of the continuous function: given any $\varepsilon>0$, a $\delta>0$ can be found such that for every $x$ within the neighborhood of $x_0$ of radius $\delta$ ($|x-x_0|<\delta$) such that $|f(x)-f(x_0)|<\varepsilon$. 
+According to the definition of the continuous function: given any $\varepsilon>0$, a $\delta>0$ can be found such that for every $x$ within the neighborhood of $x_0$ of radius $\delta$ ($|x-x_0|\leq\delta$)
+\footnote{In this case it is not important whether it is $<$ or $\leq$ because function is continuous on the whole interval and we can choose $\delta$ to be a little bit bigger than $\delta$ and we will give the same condition just with $<$} 
+such that $|f(x)-f(x_0)|<\varepsilon$. 
 Let us assume otherwise, that  $[0,1]$ cannot be divided into equal length intervals $[0, \delta, ..., \frac{1}{\delta}]$
 whose $|f(x)-f(\frac{i\delta + (i+1)\delta}{2})|<\varepsilon$. 
 
@@ -392,11 +396,11 @@ This is easily achieved by setting $b=-kx_0$ and setting $w=k$ as we want, and s
 Thus  $b=-|k|x_0, w=|k|, w_o=sgn(k), k\neq0$, in the second case $ b=|c|, w=0, w_o=sgn(c), k=0$.
 \end{proof}
 
-Using lemma 1 we can just adjust the flow of our function so they "adjust" current linear function so it starts in $f(i\delta)$ and ends in $f((i+1)\delta)$.
-For the first interval using lemma 1 $k = \frac{f(\delta) - f(0)}{\delta}$ and we should increase $b_0^3$ so that $h(0)=f_{positive}(0)$. So until the "end" of the first subinterval our function is in the $\varepsilon$ limits of $f(x)$. When it enters the second subinterval, we need to correct its coefficient in the following way:
-if the desired coefficient for new subinterval is $k_r$ than $k$ in a new unit is $k_r - k_{previous}$, because 
-$(k_r - k_{previous})x + k_{previous} = k_rx $. 
-By applying this rule to every subinterval and generating new units in hidden layer consecutively, we will get the neural network that produces function $h(x)$, which approximates $f(x)$ in limit $\varepsilon$. 
+Using lemma 1 we can just adjust the flow of our function $h(x)$ so it changes the direction according to current linear function that starts in $f(i\delta)$ and ends in $f((i+1)\delta)$.
+For the first interval using lemma 1 $k = \frac{f(\delta) - f(0)}{\delta}$ and we should increase $b_0^3$ so that $h(0)=f_{positive}(0)$. So until the "end" of the first subinterval function $h(x)$ is in the $\varepsilon$ limit of $f(x)$. When it enters the second subinterval, we need to correct its coefficient in the following way:
+if the desired coefficient for new subinterval is $k_r$ then $k$ in a new unit is $k_r - k_{previous}$, because 
+$(k_r - k_{previous})x + k_{previous} = k_rx $. \footnote{The "height" of $h(x)$ is good because it starts with a good height when it enters subinterval}
+By applying this rule of correcting coefficients at the start of every subinterval and generating new units in hidden layer for every correction consecutively, we will get the neural network that produces function $h(x)$, which approximates $f(x)$ in limit $\varepsilon$. 
 \item[5.]
 Let us notice:
 \begin{align*}
